@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Attendance</title>
+  <link rel="stylesheet" href="styles.css?v=20">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-content">
+        <img src="assets/ican-logo.png" alt="Logo" class="header-logo">
+        <h1>Student Attendance</h1>
+      </div>
+      <div class="date-display">
+        <span id="currentDate"></span>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-button active" data-tab="attendance">Mark Attendance</button>
+      <button class="tab-button" data-tab="daily-report">Daily Report</button>
+      <button class="tab-button" data-tab="individual">Individual Records</button>
+      <button class="tab-button" data-tab="overview">Overview</button>
+      <button class="tab-button" data-tab="billing" id="billingTabBtn">20-Day Billing</button>
+    </nav>
+
+    <!-- Mark Attendance Tab -->
+    <div id="attendance-tab" class="tab-content active">
+      <div class="section">
+        <div class="date-navigation">
+          <button id="prevDayBtn" class="btn btn-secondary">← Previous Day</button>
+          <div class="date-picker-container">
+            <label for="selectedDate">Select Date:</label>
+            <input type="date" id="selectedDate" class="date-input">
+          </div>
+          <button id="nextDayBtn" class="btn btn-secondary">Next Day →</button>
+        </div>
+
+        <div class="section-header">
+          <div>
+            <h2>Students</h2>
+            <p style="color: #6c757d; font-size: 0.9rem; margin-top: 5px;">
+              <span id="dateContext">Select a date and import students from Notion</span><br>
+              <span style="font-size: 0.85rem; color: #868e96;">Attendance auto-saves • Click "Import from Notion" to refresh student list</span>
+            </p>
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <button id="clearDataBtn" class="btn btn-secondary">Clear Data</button>
+            <button id="loadStudentsBtn" class="btn btn-primary">Import from Notion</button>
+          </div>
+        </div>
+
+        <div id="teachersList" class="teachers-list">
+          <div class="info-text">Select a date and click "Import from Notion" to load students</div>
+        </div>
+
+        <div class="action-buttons">
+          <button id="submitAttendanceBtn" class="btn btn-primary" style="display: none;" disabled>Submit Attendance</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily Report Tab -->
+    <div id="daily-report-tab" class="tab-content">
+      <div class="section">
+        <h2>Daily Attendance Report</h2>
+
+        <div class="report-controls">
+          <label>
+            Select Date:
+            <input type="date" id="reportDate" />
+          </label>
+          <button id="loadDailyReportBtn" class="btn btn-secondary">Load Report</button>
+        </div>
+
+        <div class="report-filter-controls" id="reportFilterControls" style="display: none;">
+          <div style="display: flex; flex-direction: column; gap: 15px;">
+            <!-- Status Filters -->
+            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+              <strong>Status:</strong>
+              <label style="display: flex; align-items: center; gap: 5px;">
+                <input type="checkbox" id="filterAll" class="filter-checkbox" checked>
+                All
+              </label>
+              <label style="display: flex; align-items: center; gap: 5px;">
+                <input type="checkbox" id="filterPresent" class="filter-checkbox" checked>
+                Present
+              </label>
+              <label style="display: flex; align-items: center; gap: 5px;">
+                <input type="checkbox" id="filterLate" class="filter-checkbox" checked>
+                Late
+              </label>
+              <label style="display: flex; align-items: center; gap: 5px;">
+                <input type="checkbox" id="filterAbsent" class="filter-checkbox" checked>
+                Absent
+              </label>
+            </div>
+
+            <!-- Shift Filters -->
+            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+              <strong>Shift:</strong>
+              <label style="display: flex; align-items: center; gap: 4px;">
+                <input type="checkbox" id="filterAllShifts" class="filter-checkbox" checked>
+                All
+              </label>
+              <label style="display: flex; align-items: center; gap: 4px;">
+                <input type="checkbox" id="filterShift8am" class="filter-checkbox" checked>
+                8am
+              </label>
+              <label style="display: flex; align-items: center; gap: 4px;">
+                <input type="checkbox" id="filterShift9am" class="filter-checkbox" checked>
+                9am
+              </label>
+              <label style="display: flex; align-items: center; gap: 4px;">
+                <input type="checkbox" id="filterShift10am" class="filter-checkbox" checked>
+                10am
+              </label>
+              <label style="display: flex; align-items: center; gap: 4px;">
+                <input type="checkbox" id="filterShift11am" class="filter-checkbox" checked>
+                11am
+              </label>
+              <label style="display: flex; align-items: center; gap: 4px;">
+                <input type="checkbox" id="filterShift12pm" class="filter-checkbox" checked>
+                12pm
+              </label>
+              <label style="display: flex; align-items: center; gap: 4px;">
+                <input type="checkbox" id="filterShift1pm" class="filter-checkbox" checked>
+                1pm
+              </label>
+              <label style="display: flex; align-items: center; gap: 4px;">
+                <input type="checkbox" id="filterShift2pm" class="filter-checkbox" checked>
+                2pm
+              </label>
+              <label style="display: flex; align-items: center; gap: 4px;">
+                <input type="checkbox" id="filterShift3pm" class="filter-checkbox" checked>
+                3pm
+              </label>
+              <label style="display: flex; align-items: center; gap: 4px;">
+                <input type="checkbox" id="filterShift4pm" class="filter-checkbox" checked>
+                4pm
+              </label>
+              <label style="display: flex; align-items: center; gap: 4px;">
+                <input type="checkbox" id="filterShift5pm" class="filter-checkbox" checked>
+                5pm
+              </label>
+              <label style="display: flex; align-items: center; gap: 4px;">
+                <input type="checkbox" id="filterShift6pm" class="filter-checkbox" checked>
+                6pm
+              </label>
+              <label style="display: flex; align-items: center; gap: 4px;">
+                <input type="checkbox" id="filterShift7pm" class="filter-checkbox" checked>
+                7pm
+              </label>
+              <label style="display: flex; align-items: center; gap: 4px;">
+                <input type="checkbox" id="filterShift8pm" class="filter-checkbox" checked>
+                8pm
+              </label>
+            </div>
+
+            <!-- Download Button -->
+            <div style="display: flex; justify-content: flex-end;">
+              <button id="downloadReportBtn" class="btn btn-primary">📷 Download as Image</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="dailyReportContent" class="report-content">
+          <p class="info-text">Select a date and click "Load Report" to view attendance.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Individual Records Tab -->
+    <div id="individual-tab" class="tab-content">
+      <div class="section">
+        <h2>Individual Student Records</h2>
+
+        <div class="report-controls" style="align-items: flex-end;">
+          <label>
+            Select Student:
+            <select id="individualStudentSelect" class="modal-select" style="min-width: 250px; margin-bottom: 0;">
+              <option value="">-- Select a Student --</option>
+            </select>
+          </label>
+          <label>
+            From:
+            <div style="display: flex; gap: 5px;">
+              <input type="date" id="individualStartDate" />
+              <button type="button" class="btn btn-secondary" style="padding: 8px 12px;" onclick="document.getElementById('individualStartDate').value = '';" title="Clear date">✕</button>
+            </div>
+          </label>
+          <label>
+            To:
+            <div style="display: flex; gap: 5px;">
+              <input type="date" id="individualEndDate" />
+              <button type="button" class="btn btn-secondary" style="padding: 8px 12px;" onclick="document.getElementById('individualEndDate').value = '';" title="Clear date">✕</button>
+            </div>
+          </label>
+          <button id="loadIndividualRecordsBtn" class="btn btn-secondary">Load Records</button>
+          <button id="downloadIndividualRecordsBtn" class="btn btn-primary" style="display: none;">📷 Download as Image</button>
+        </div>
+
+        <div id="individualSummary" class="individual-summary" style="display: none;"></div>
+
+        <div id="individualRecordsContent" class="report-content">
+          <p class="info-text">Select a student from the dropdown to view their attendance history.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overview Tab -->
+    <div id="overview-tab" class="tab-content">
+      <div class="section">
+        <h2>Analytics Dashboard</h2>
+
+        <div class="report-controls">
+          <label>
+            From:
+            <input type="date" id="overviewStartDate" />
+          </label>
+          <label>
+            To:
+            <input type="date" id="overviewEndDate" />
+          </label>
+          <button id="loadOverviewBtn" class="btn btn-secondary">Load Analytics</button>
+          <button id="exportCsvBtn" class="btn btn-primary">Export CSV</button>
+          <button id="downloadAnalyticsBtn" class="btn btn-primary">📷 Download Analytics</button>
+        </div>
+
+        <!-- Summary Statistics -->
+        <div id="overviewSummary" class="summary-section"></div>
+
+        <!-- Charts Section -->
+        <div class="analytics-charts-section">
+          <div class="chart-row">
+            <div class="chart-container">
+              <h3>Daily Attendance Trend</h3>
+              <p class="chart-subtitle">Track attendance changes over time</p>
+              <canvas id="trendChart"></canvas>
+            </div>
+            <div class="chart-container">
+              <h3>Status Distribution</h3>
+              <p class="chart-subtitle">Overall attendance breakdown</p>
+              <canvas id="statusPieChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-row">
+            <div class="chart-container">
+              <h3>Late Reasons Breakdown</h3>
+              <p class="chart-subtitle">Most common reasons for tardiness</p>
+              <canvas id="lateReasonsChart"></canvas>
+            </div>
+            <div class="chart-container">
+              <h3>Absent Reasons Breakdown</h3>
+              <p class="chart-subtitle">Most common reasons for absence</p>
+              <canvas id="absentReasonsChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-row">
+            <div class="chart-container">
+              <h3>Shift Performance</h3>
+              <p class="chart-subtitle">Attendance by work shift</p>
+              <canvas id="shiftChart"></canvas>
+            </div>
+            <div class="chart-container">
+              <h3>Day of Week Patterns</h3>
+              <p class="chart-subtitle">Attendance issues by weekday</p>
+              <canvas id="dayOfWeekChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-row">
+            <div class="chart-container" style="grid-column: 1 / -1;">
+              <h3>Individual Student Attendance Breakdown</h3>
+              <p class="chart-subtitle">Performance comparison across all teachers</p>
+              <canvas id="teacherBreakdownChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Teacher Insights -->
+        <div id="teacherInsights" class="insights-section"></div>
+
+        <!-- Substitute Coverage -->
+        <div id="substituteCoverage" class="insights-section"></div>
+      </div>
+    </div>
+
+    <!-- 20-Day Billing Tracker Tab -->
+    <div id="billing-tab" class="tab-content">
+      <div class="section">
+        <h2>20-Day Billing Tracker</h2>
+        <p style="color: #6c757d; margin-bottom: 20px;">Track student attendance for billing cycles. Students are charged every 20 days of attendance (present or late).</p>
+
+        <!-- Add Student Section -->
+        <div class="billing-add-section">
+          <h3>Add Student to Tracking</h3>
+          <div class="billing-add-form">
+            <div class="form-group">
+              <label for="billingStudentSelect">Select Student:</label>
+              <select id="billingStudentSelect" class="modal-select">
+                <option value="">-- Select a Student --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="billingStartDate">Start Date:</label>
+              <input type="date" id="billingStartDate" class="date-input">
+            </div>
+            <button id="addToBillingBtn" class="btn btn-primary">+ Add to Tracker</button>
+          </div>
+        </div>
+
+        <!-- Due for Charging Section -->
+        <div class="billing-section billing-due-section" id="billingDueSection" style="display: none;">
+          <div class="billing-section-header">
+            <h3>🔴 Due for Charging (Reached 20 days)</h3>
+            <button id="chargeSelectedBtn" class="btn btn-primary" style="display: none;">Mark Selected as Charged</button>
+          </div>
+          <div id="billingDueList" class="billing-list"></div>
+        </div>
+
+        <!-- Approaching Section -->
+        <div class="billing-section billing-approaching-section" id="billingApproachingSection" style="display: none;">
+          <h3>🟡 Approaching (15-19 days)</h3>
+          <div id="billingApproachingList" class="billing-list"></div>
+        </div>
+
+        <!-- In Progress Section -->
+        <div class="billing-section billing-progress-section" id="billingProgressSection" style="display: none;">
+          <h3>📊 In Progress</h3>
+          <div id="billingProgressList" class="billing-list"></div>
+        </div>
+
+        <!-- No Students Message -->
+        <div id="billingNoStudents" class="info-text" style="text-align: center; padding: 40px;">
+          No students are being tracked yet. Add students using the form above.
+        </div>
+
+        <!-- Charge History Section -->
+        <div class="billing-section billing-history-section">
+          <div class="billing-section-header">
+            <h3>📜 Charge History</h3>
+            <button id="exportBillingHistoryBtn" class="btn btn-secondary">Export History</button>
+          </div>
+          <div id="billingHistoryList" class="billing-history-table">
+            <p class="info-text">No charge history yet.</p>
+          </div>
+        </div>
+
+        <!-- Holiday Management Section -->
+        <div class="billing-holidays-section">
+          <h4>🏖️ Non-Working Days (Holidays)</h4>
+          <p style="font-size: 0.85rem; color: #a16207; margin-bottom: 15px;">
+            Add holidays to exclude them from the estimated completion date calculation. Weekends are automatically excluded.
+          </p>
+          <div class="holiday-add-form">
+            <input type="date" id="holidayDateInput" placeholder="Date">
+            <input type="text" id="holidayDescInput" placeholder="Description (optional)">
+            <button id="addHolidayBtn" class="btn btn-primary btn-sm">Add Holiday</button>
+          </div>
+          <div id="holidayList" class="holiday-list">
+            <span class="info-text">No holidays added yet.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>Student Attendance System - <span id="footerYear"></span></p>
+    </footer>
+  </div>
+
+  <!-- Late Reason Modal -->
+  <div id="lateModal" class="modal">
+    <div class="modal-content">
+      <h3>Late Reason</h3>
+      <p class="modal-teacher-name" id="lateStudentName"></p>
+
+      <div style="margin-bottom: 15px;">
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+          <input type="checkbox" id="lateNotifiedCheckbox" style="cursor: pointer;">
+          <span>Teacher notified about student's tardiness</span>
+        </label>
+      </div>
+
+      <div style="margin-bottom: 15px;">
+        <label for="lateMinutesInput">Minutes Late:</label>
+        <input type="number" id="lateMinutesInput" class="modal-input" placeholder="e.g., 15" min="1" max="480" style="width: 120px;">
+      </div>
+
+      <label for="lateReasonSelect">Select Reason:</label>
+      <select id="lateReasonSelect" class="modal-select">
+        <!-- Populated by JavaScript -->
+      </select>
+
+      <div id="lateCustomReasonContainer" style="display: none; margin-top: 10px;">
+        <label for="lateCustomReason">Specify reason:</label>
+        <input type="text" id="lateCustomReason" class="modal-input" placeholder="Enter custom reason">
+      </div>
+
+      <div class="modal-buttons">
+        <button id="lateSaveBtn" class="btn btn-primary">Save</button>
+        <button id="lateCancelBtn" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Absent Details Modal -->
+  <div id="absentModal" class="modal">
+    <div class="modal-content">
+      <h3>Absent Details</h3>
+      <p class="modal-teacher-name" id="absentStudentName"></p>
+
+      <div style="margin-bottom: 15px;">
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+          <input type="checkbox" id="absentNotifiedCheckbox" style="cursor: pointer;">
+          <span>Teacher notified about student's absence</span>
+        </label>
+      </div>
+
+      <label for="absentReasonSelect">Reason for Absence:</label>
+      <select id="absentReasonSelect" class="modal-select">
+        <!-- Populated by JavaScript -->
+      </select>
+
+      <div id="absentCustomReasonContainer" style="display: none; margin-top: 10px;">
+        <label for="absentCustomReason">Specify reason:</label>
+        <input type="text" id="absentCustomReason" class="modal-input" placeholder="Enter custom reason">
+      </div>
+
+      <div class="modal-buttons">
+        <button id="absentSaveBtn" class="btn btn-primary">Save</button>
+        <button id="absentCancelBtn" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Undertime/Left Early Modal -->
+  <div id="undertimeModal" class="modal">
+    <div class="modal-content">
+      <h3>Left Early / Undertime</h3>
+      <p class="modal-teacher-name" id="undertimeStudentName"></p>
+
+      <div style="margin-bottom: 15px;">
+        <label for="undertimeMinutesInput">Minutes Left Early:</label>
+        <input type="number" id="undertimeMinutesInput" class="modal-input" placeholder="e.g., 30" min="1" max="480" style="width: 120px;">
+      </div>
+
+      <label for="undertimeReasonSelect">Reason for Leaving Early:</label>
+      <select id="undertimeReasonSelect" class="modal-select">
+        <!-- Populated by JavaScript -->
+      </select>
+
+      <div id="undertimeCustomReasonContainer" style="display: none; margin-top: 10px;">
+        <label for="undertimeCustomReason">Specify reason:</label>
+        <input type="text" id="undertimeCustomReason" class="modal-input" placeholder="Enter custom reason">
+      </div>
+
+      <div class="modal-buttons">
+        <button id="undertimeSaveBtn" class="btn btn-primary">Save</button>
+        <button id="undertimeCancelBtn" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Billing Charge Modal (Tuition Input) -->
+  <div id="billingChargeModal" class="modal">
+    <div class="modal-content" style="max-width: 450px;">
+      <h3>Charge Student</h3>
+      <p id="chargeStudentName" style="color: var(--primary); font-weight: 600; margin-bottom: 20px;"></p>
+
+      <div style="margin-bottom: 15px;">
+        <label for="chargeTuitionInput">수업비 Tuition Amount:</label>
+        <div style="display: flex; gap: 10px;">
+          <select id="chargeCurrencySelect" class="modal-select" style="width: 100px;">
+            <option value="₱">₱ Peso</option>
+            <option value="₩">₩ Won</option>
+          </select>
+          <input type="number" id="chargeTuitionInput" class="modal-input" placeholder="e.g., 78000" style="flex: 1;" min="0">
+        </div>
+      </div>
+
+      <div style="margin-bottom: 20px; padding: 12px; background: #f8fafc; border-radius: 8px; font-size: 0.9rem;">
+        <p style="margin: 0;"><strong>수업 기간:</strong> <span id="chargeClassPeriod">-</span></p>
+        <p style="margin: 8px 0 0 0;"><strong>출석일:</strong> <span id="chargeDaysCount">0</span> days</p>
+      </div>
+
+      <div style="margin-bottom: 15px;">
+        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem; color: var(--text-secondary);">
+          <input type="checkbox" id="useCustomDatesCheck" style="cursor: pointer;">
+          Use custom dates instead
+        </label>
+        <div id="customDatesSection" style="display: none; margin-top: 10px; padding: 12px; background: #fff7ed; border-radius: 8px; border: 1px solid #fed7aa;">
+          <div style="display: flex; gap: 10px;">
+            <div style="flex: 1;">
+              <label style="font-size: 0.8rem; color: var(--text-secondary);">Start Date</label>
+              <input type="date" id="chargeStartDate" class="modal-input" style="width: 100%;">
+            </div>
+            <div style="flex: 1;">
+              <label style="font-size: 0.8rem; color: var(--text-secondary);">End Date</label>
+              <input type="date" id="chargeEndDate" class="modal-input" style="width: 100%;">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Absences & Carry-over Section -->
+      <div id="absencesSection" style="margin-bottom: 15px; padding: 12px; background: #fef3c7; border-radius: 8px; border: 1px solid #fcd34d;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+          <span style="font-size: 1rem; font-weight: 600; color: #92400e;">Absences in this period:</span>
+          <span id="chargeAbsencesCount" style="font-size: 1.2rem; font-weight: 700; color: #92400e;">0</span>
+          <span style="color: #92400e;">days</span>
+          <button type="button" id="editAbsencesBtn" class="btn btn-sm" style="margin-left: auto; padding: 4px 10px; font-size: 0.8rem; background: #92400e; color: white; border: none; border-radius: 4px;">Edit</button>
+        </div>
+        <div id="manualAbsencesSection" style="display: none; margin-bottom: 10px; padding: 10px; background: white; border-radius: 6px; border: 1px solid #fcd34d;">
+          <label style="font-size: 0.85rem; color: #78350f; display: block; margin-bottom: 6px;">
+            Manual absences (owed days not in system):
+          </label>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="number" id="manualAbsencesInput" class="modal-input" min="0" max="20" value="0" style="width: 80px; text-align: center;">
+            <button type="button" id="applyAbsencesBtn" class="btn btn-sm btn-primary" style="padding: 6px 12px;">Apply</button>
+            <button type="button" id="cancelAbsencesBtn" class="btn btn-sm btn-secondary" style="padding: 6px 12px;">Cancel</button>
+          </div>
+          <p style="margin: 8px 0 0 0; font-size: 0.75rem; color: #a16207;"><em>Use this to add absences that weren't tracked in the attendance system</em></p>
+        </div>
+        <div id="carryOverOptions" style="display: none;">
+          <p style="margin: 0 0 8px 0; font-size: 0.85rem; color: #78350f;">Carry over to next cycle?</p>
+          <div style="display: flex; gap: 10px;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 8px 12px; background: white; border-radius: 6px; border: 2px solid #e5e7eb; flex: 1;">
+              <input type="radio" name="carryOverType" value="none" checked style="cursor: pointer;">
+              <span style="font-size: 0.85rem;">No carry-over</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 8px 12px; background: white; border-radius: 6px; border: 2px solid #e5e7eb; flex: 1;">
+              <input type="radio" name="carryOverType" value="reduce" style="cursor: pointer;">
+              <span style="font-size: 0.85rem;">📉 Reduce</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 8px 12px; background: white; border-radius: 6px; border: 2px solid #e5e7eb; flex: 1;">
+              <input type="radio" name="carryOverType" value="extend" style="cursor: pointer;">
+              <span style="font-size: 0.85rem;">📈 Extend</span>
+            </label>
+          </div>
+          <div style="margin-top: 10px; font-size: 0.8rem; color: #78350f;">
+            <p id="carryOverDescription" style="margin: 0;"><em>Select an option to see how it affects the next cycle</em></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-buttons">
+        <button id="chargeGenerateSlipBtn" class="btn btn-primary">Generate Slip</button>
+        <button id="chargeCancelBtn" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Billing Slip Preview Modal -->
+  <div id="billingSlipModal" class="modal">
+    <div class="modal-content" style="max-width: 500px; padding: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3 style="margin: 0;">Charge Slip Preview</h3>
+        <button id="slipCloseBtn" class="btn btn-secondary btn-sm">Close</button>
+      </div>
+
+      <!-- Slip Container -->
+      <div id="slipContainer" class="slip-container">
+        <!-- Header -->
+        <div class="slip-header">
+          <img src="assets/ican-logo.png" alt="ICAN" class="slip-logo-img">
+          <div class="slip-address">
+            16 flr Strata 100 Building, Emerald Ave,<br>
+            Ortigas Center, Pasig, Metro Manila
+          </div>
+        </div>
+
+        <!-- Student Info -->
+        <div class="slip-info">
+          <div class="slip-row">
+            <span class="slip-label">이름 (Name)</span>
+            <span class="slip-value" id="slipStudentName">-</span>
+          </div>
+          <div class="slip-row">
+            <span class="slip-label">납부일 (Payment Status)</span>
+            <span class="slip-value slip-unpaid">미납</span>
+          </div>
+          <div class="slip-row">
+            <span class="slip-label">수업 기간 (Class Period)</span>
+            <span class="slip-value" id="slipClassPeriod">-</span>
+          </div>
+        </div>
+
+        <!-- Tuition -->
+        <div class="slip-tuition">
+          <div class="tuition-label">수업비 TUITION</div>
+          <div class="tuition-amount" id="slipTuitionAmount">₱0</div>
+          <div class="tuition-note">8시간씩 총 20회 수업</div>
+        </div>
+
+        <!-- Attendance Dates -->
+        <div class="slip-dates">
+          <div class="dates-title">출석일 (Attendance Dates) - <span id="slipDatesCount">20</span> Days</div>
+          <div class="dates-grid" id="slipDatesGrid">
+            <!-- Dates will be populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Absences & Carry-over Info (hidden by default) -->
+        <div id="slipCarryOverSection" class="slip-carry-over" style="display: none;">
+          <div class="carry-over-content">
+            <span id="slipCarryOverText">-</span>
+          </div>
+        </div>
+
+        <!-- Bank Info -->
+        <div class="slip-bank">
+          <div class="bank-title">입금 계좌 (Bank Account)</div>
+          <div class="bank-item">
+            <span class="bank-name">BDO</span>
+            <span class="bank-account">Eun Young Cho 002860230625</span>
+          </div>
+          <div class="bank-item">
+            <span class="bank-name">우리은행</span>
+            <span class="bank-account">조은영 120 08 236993</span>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="slip-footer" id="slipFooter">
+          Generated on December 18, 2024
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button id="slipDownloadBtn" class="btn btn-primary" style="flex: 1;">Download as Image</button>
+        <button id="slipConfirmChargeBtn" class="btn btn-success" style="flex: 1;">Confirm & Save Charge</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Billing Edit Start Date Modal -->
+  <div id="billingEditModal" class="modal">
+    <div class="modal-content" style="max-width: 450px;">
+      <h3>Edit Billing Cycle</h3>
+      <p id="editStudentName" style="color: var(--primary); font-weight: 600; margin-bottom: 20px;"></p>
+
+      <div style="margin-bottom: 20px;">
+        <label for="editStartDateInput">Start Date:</label>
+        <input type="date" id="editStartDateInput" class="modal-input" style="width: 100%;">
+        <p style="color: #6c757d; font-size: 0.85rem; margin-top: 8px;">
+          Changing the start date will recalculate the attendance count from this new date.
+        </p>
+      </div>
+
+      <div style="margin-bottom: 20px; padding: 12px; background: #f8fafc; border-radius: 8px;">
+        <p style="margin: 0; font-size: 0.9rem;"><strong>Current Cycle:</strong> <span id="editCurrentCycle">#1</span></p>
+        <p style="margin: 8px 0 0 0; font-size: 0.9rem;"><strong>Current Start Date:</strong> <span id="editCurrentStartDate">-</span></p>
+        <p id="editCurrentCarryInfo" style="margin: 8px 0 0 0; font-size: 0.9rem; display: none;"><strong>Carry-over:</strong> <span id="editCurrentCarryText">-</span></p>
+      </div>
+
+      <!-- Owed Days from Previous Period -->
+      <div style="margin-bottom: 20px; padding: 12px; background: #fef3c7; border-radius: 8px; border: 1px solid #fcd34d;">
+        <p style="margin: 0 0 10px 0; font-weight: 600; color: #92400e;">Owed Days from Previous Period</p>
+        <p style="margin: 0 0 10px 0; font-size: 0.8rem; color: #a16207;">Add absences from a previous cycle that weren't tracked</p>
+
+        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+          <label style="font-size: 0.9rem; color: #78350f;">Days owed:</label>
+          <input type="number" id="editCarriedDaysInput" class="modal-input" min="0" max="20" value="0" style="width: 80px; text-align: center;">
+        </div>
+
+        <div id="editCarryTypeSection" style="display: none;">
+          <p style="margin: 0 0 8px 0; font-size: 0.85rem; color: #78350f;">How to apply:</p>
+          <div style="display: flex; gap: 10px;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 8px 12px; background: white; border-radius: 6px; border: 2px solid #e5e7eb; flex: 1;">
+              <input type="radio" name="editCarryType" value="reduce" checked style="cursor: pointer;">
+              <span style="font-size: 0.85rem;">📉 Reduce</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 8px 12px; background: white; border-radius: 6px; border: 2px solid #e5e7eb; flex: 1;">
+              <input type="radio" name="editCarryType" value="extend" style="cursor: pointer;">
+              <span style="font-size: 0.85rem;">📈 Extend</span>
+            </label>
+          </div>
+          <p id="editCarryDescription" style="margin: 10px 0 0 0; font-size: 0.8rem; color: #78350f;"></p>
+        </div>
+      </div>
+
+      <div class="modal-buttons">
+        <button id="billingEditSaveBtn" class="btn btn-primary">Save Changes</button>
+        <button id="billingEditCancelBtn" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Billing Password Modal -->
+  <div id="billingPasswordModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+      <h3>🔒 Password Required</h3>
+      <p style="color: #6c757d; margin-bottom: 20px;">Enter password to access the 20-Day Billing Tracker</p>
+
+      <div style="margin-bottom: 20px;">
+        <label for="billingPasswordInput">Password:</label>
+        <input type="password" id="billingPasswordInput" class="modal-input" placeholder="Enter password" style="width: 100%;">
+        <p id="billingPasswordError" style="color: #dc2626; font-size: 0.9rem; margin-top: 8px; display: none;">Incorrect password. Please try again.</p>
+      </div>
+
+      <div class="modal-buttons">
+        <button id="billingPasswordSubmitBtn" class="btn btn-primary">Unlock</button>
+        <button id="billingPasswordCancelBtn" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="helpers.js?t=1733400007"></script>
+  <script src="modal-handler.js?t=1733400007"></script>
+  <script src="app.js?t=1733400007"></script>
+  <script src="analytics.js?t=1733400007"></script>
+  <script src="billing-tracker.js?t=1733400007"></script>
+</body>
+</html>

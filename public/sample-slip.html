@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sample Charge Slip - ICAN</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+      background: #f5f5f5;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .slip-container {
+      background: white;
+      width: 400px;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      border: 1px solid #e0e0e0;
+    }
+
+    /* Header */
+    .slip-header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px dashed #ddd;
+    }
+
+    .slip-logo {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #EA580C;
+      letter-spacing: 4px;
+      margin-bottom: 8px;
+    }
+
+    .slip-address {
+      font-size: 0.75rem;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    /* Info Section */
+    .slip-info {
+      margin-bottom: 20px;
+    }
+
+    .slip-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .slip-row:last-child {
+      border-bottom: none;
+    }
+
+    .slip-label {
+      font-size: 0.85rem;
+      color: #888;
+      font-weight: 500;
+    }
+
+    .slip-value {
+      font-size: 0.95rem;
+      color: #333;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .slip-value.highlight {
+      color: #EA580C;
+    }
+
+    .slip-value.unpaid {
+      color: #dc2626;
+      background: #fef2f2;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    /* Tuition Section */
+    .slip-tuition {
+      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+      border: 2px solid #EA580C;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .tuition-label {
+      font-size: 0.8rem;
+      color: #EA580C;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .tuition-amount {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #EA580C;
+    }
+
+    .tuition-note {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 5px;
+    }
+
+    /* Attendance Dates */
+    .slip-dates {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .dates-title {
+      font-size: 0.8rem;
+      color: #64748b;
+      font-weight: 600;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .dates-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .date-item {
+      font-size: 0.7rem;
+      color: #475569;
+      background: white;
+      padding: 4px 6px;
+      border-radius: 4px;
+      text-align: center;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Bank Info */
+    .slip-bank {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 2px dashed #ddd;
+    }
+
+    .bank-title {
+      font-size: 0.75rem;
+      color: #888;
+      margin-bottom: 10px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .bank-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+    }
+
+    .bank-name {
+      color: #666;
+      font-weight: 500;
+    }
+
+    .bank-account {
+      color: #333;
+      font-weight: 600;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* Footer */
+    .slip-footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #999;
+    }
+
+    /* Notes section */
+    .notes-section {
+      background: #fff;
+      padding: 40px;
+      border-radius: 12px;
+      max-width: 600px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .notes-section h2 {
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    .notes-section ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .notes-section li {
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+      color: #555;
+    }
+
+    .notes-section li:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Sample Charge Slip Design</h1>
+
+  <div class="slip-container" id="chargeSlip">
+    <!-- Header -->
+    <div class="slip-header">
+      <div class="slip-logo">ICAN</div>
+      <div class="slip-address">
+        16 flr Strata 100 Building, Emerald Ave,<br>
+        Ortigas Center, Pasig, Metro Manila
+      </div>
+    </div>
+
+    <!-- Student Info -->
+    <div class="slip-info">
+      <div class="slip-row">
+        <span class="slip-label">이름 (Name)</span>
+        <span class="slip-value">황채민</span>
+      </div>
+      <div class="slip-row">
+        <span class="slip-label">납부일 (Payment Status)</span>
+        <span class="slip-value unpaid">미납</span>
+      </div>
+      <div class="slip-row">
+        <span class="slip-label">수업 기간 (Class Period)</span>
+        <span class="slip-value">12월 1일 - 12월 18일</span>
+      </div>
+    </div>
+
+    <!-- Tuition -->
+    <div class="slip-tuition">
+      <div class="tuition-label">수업비 TUITION</div>
+      <div class="tuition-amount">₱78,000</div>
+      <div class="tuition-note">8시간씩 총 20회 수업</div>
+    </div>
+
+    <!-- Attendance Dates -->
+    <div class="slip-dates">
+      <div class="dates-title">출석일 (Attendance Dates) - 20 Days</div>
+      <div class="dates-grid">
+        <div class="date-item">12/1</div>
+        <div class="date-item">12/2</div>
+        <div class="date-item">12/3</div>
+        <div class="date-item">12/4</div>
+        <div class="date-item">12/5</div>
+        <div class="date-item">12/6</div>
+        <div class="date-item">12/8</div>
+        <div class="date-item">12/9</div>
+        <div class="date-item">12/10</div>
+        <div class="date-item">12/11</div>
+        <div class="date-item">12/12</div>
+        <div class="date-item">12/13</div>
+        <div class="date-item">12/14</div>
+        <div class="date-item">12/15</div>
+        <div class="date-item">12/16</div>
+        <div class="date-item">12/17</div>
+        <div class="date-item">12/18</div>
+        <div class="date-item">12/19</div>
+        <div class="date-item">12/20</div>
+        <div class="date-item">12/21</div>
+      </div>
+    </div>
+
+    <!-- Bank Info -->
+    <div class="slip-bank">
+      <div class="bank-title">입금 계좌 (Bank Account)</div>
+      <div class="bank-item">
+        <span class="bank-name">BDO</span>
+        <span class="bank-account">Eun Young Cho 002860230625</span>
+      </div>
+      <div class="bank-item">
+        <span class="bank-name">우리은행</span>
+        <span class="bank-account">조은영 120 08 23699</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="slip-footer">
+      Generated on December 18, 2024
+    </div>
+  </div>
+
+  <div class="notes-section">
+    <h2>Design Notes</h2>
+    <ul>
+      <li><strong>Header:</strong> ICAN logo with full address</li>
+      <li><strong>Student Info:</strong> Name, payment status, class period</li>
+      <li><strong>Tuition:</strong> Manually entered amount when charging</li>
+      <li><strong>Attendance Dates:</strong> Grid showing all 20 attendance dates</li>
+      <li><strong>Bank Details:</strong> BDO and 우리은행 account info</li>
+      <li><strong>Footer:</strong> Generation date</li>
+    </ul>
+    <p style="margin-top: 20px; color: #666;">
+      <strong>When you click "Charge":</strong><br>
+      1. A modal will ask for the tuition amount<br>
+      2. The slip will be generated with all the details<br>
+      3. You can download it as an image
+    </p>
+  </div>
+
+</body>
+</html>
